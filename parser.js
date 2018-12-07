@@ -1,18 +1,19 @@
 const cr = require("./cradle");
 
 function factor() {
-    if (_look === '('){
+    if (_look === '(') {
         cr.match('(');
         expression();
         cr.match(')');
     }
-    else{
+    else {
         cr.emitLn('MOVE #' + cr.getNum() + ',D0');
     }
 }
 
-function term(){
+function term() {
     factor();
+
     while (['*', '/'].includes(_look)) {
         cr.emitLn('MOVE D0,-(SP)');
         switch (_look) {
@@ -29,23 +30,13 @@ function term(){
     }
 }
 
-function multiply() {
-    cr.match('*');
-    factor();
-    cr.emitLn('MULS (SP)+,D0');
-}
-
-function divide(){
-    cr.match('/');
-    factor();
-    cr.emitLn('MOVE (SP)+,D1');
-    cr.emitLn('DIVS D1,D0');
-}
-
 function expression() {
-    term();
+    if (cr.isAddOp(_look))
+        cr.emitLn('CLR D0');
+    else
+        term();
 
-    while (['+', '-'].includes(_look)) {
+    while (cr.isAddOp(_look)) {
         cr.emitLn('MOVE D0,-(SP)');
         switch (_look) {
             case '+':
@@ -61,6 +52,19 @@ function expression() {
     }
 }
 
+function multiply() {
+    cr.match('*');
+    factor();
+    cr.emitLn('MULS (SP)+,D0');
+}
+
+function divide() {
+    cr.match('/');
+    factor();
+    cr.emitLn('MOVE (SP)+,D1');
+    cr.emitLn('DIVS D1,D0');
+}
+
 function add() {
     cr.match('+');
     term();
@@ -74,7 +78,7 @@ function subtract() {
     cr.emitLn('NEG D0')
 }
 
-cr.init('1-(2+3)*5');
+cr.init('-1-(2+3)*5');
 expression();
 
 // https://www.asm80.com/

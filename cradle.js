@@ -11,6 +11,7 @@ module.exports = {
     abort,
     expected,
     match,
+    isAddOp,
     isAlpha,
     isDigit,
     getName,
@@ -55,6 +56,10 @@ function match(x) {
     getChar();    
 }
 
+function isAddOp(c){
+    return ['+', '-'].includes(c);
+}
+
 // Is Alpha Character.
 function isAlpha(c) {
     c = c.toUpperCase();
@@ -90,7 +95,6 @@ function getNum() {
 function emitLn(s) {
     writeLn(TAB, s);
 }
-
 
 function writeLn() {
     console.log.apply(console, arguments);
