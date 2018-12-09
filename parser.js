@@ -6,6 +6,9 @@ function factor() {
         expression();
         cr.match(')');
     }
+    else if (cr.isAlpha(_look)){
+        cr.emitLn('MOVE ' + cr.getName() + ',D0');
+    }
     else {
         cr.emitLn('MOVE #' + cr.getNum() + ',D0');
     }
@@ -78,7 +81,7 @@ function subtract() {
     cr.emitLn('NEG D0')
 }
 
-cr.init('-1-(2+3)*5');
+cr.init('-1-(2+3)*5*a');
 expression();
 
 // https://www.asm80.com/
