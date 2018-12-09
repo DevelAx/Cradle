@@ -7,10 +7,23 @@ function factor() {
         cr.match(')');
     }
     else if (cr.isAlpha(_look)){
-        cr.emitLn('MOVE ' + cr.getName() + ',D0');
+        ident();
     }
     else {
         cr.emitLn('MOVE #' + cr.getNum() + ',D0');
+    }
+}
+
+// Parse and translate an Identifier.
+function ident(){
+    var name = cr.getName();
+    if (_look === '('){
+        cr.match('(');
+        cr.match(')');
+        cr.emitLn('BRS ' + name);
+    }
+    else{
+        cr.emitLn('MOVE ' + name + ',D0');
     }
 }
 
@@ -81,7 +94,7 @@ function subtract() {
     cr.emitLn('NEG D0')
 }
 
-cr.init('-1-(2+3)*5*a');
+cr.init('-1-(2+3)*5*a+x()');
 expression();
 
 // https://www.asm80.com/
