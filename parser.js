@@ -94,7 +94,11 @@ function subtract() {
     cr.emitLn('NEG D0')
 }
 
-cr.init('-1-(2+3)*5*a+x()');
+cr.init(`-1-(2+3)*5*a+x()
+`);
 expression();
+
+if (_look !== '\n')
+    cr.expected("New line");
 
 // https://www.asm80.com/
