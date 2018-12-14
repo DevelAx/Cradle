@@ -24,6 +24,7 @@ function init(s) {
     _text = s;
     _pos = 0;
     getChar();
+    skipWhite();
 }
 
 // Read a new char from the input stream.
@@ -53,7 +54,40 @@ function match(x) {
     if (_look !== x)
         return expected(`'${x}'`);
     
-    getChar();    
+    getChar(); 
+    skipWhite();   
+}
+
+// Get an identifier.
+function getName() {
+    var token = '';
+
+    if (!isAlpha(_look))
+        expected('Name');
+
+    while(isAlNum(_look)){
+        token += _look.toUpperCase();
+        getChar();
+    }
+
+    skipWhite();
+    return token;
+}
+
+// Get a number.
+function getNum() {
+    var val = '';
+
+    if (!isDigit(_look))
+        expected('Integer');
+
+    while(isDigit(_look)){
+        val += _look;
+        getChar();
+    }
+    
+    skipWhite();
+    return val;
 }
 
 function isAddOp(c){
@@ -71,24 +105,17 @@ function isDigit(c) {
     return (c >= '0' && c <= '9');
 }
 
-// Get an identifier.
-function getName() {
-    if (!isAlpha(_look))
-        expected('Name');
-
-    var result = _look.toUpperCase();
-    getChar();
-    return result;
+function isAlNum(c){
+    return isAlpha(c) || isDigit(c);
 }
 
-// Get a number.
-function getNum() {
-    if (!isDigit(_look))
-        expected('Integer');
+function isWhite(c){
+    return c === ' ' || c === '\t';
+}
 
-    var result = _look;
-    getChar();
-    return result;
+function skipWhite(){
+    while(isWhite(_look))
+        getChar();
 }
 
 // Output a string with TAB and LN.

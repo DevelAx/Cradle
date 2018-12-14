@@ -46,6 +46,27 @@ function term() {
     }
 }
 
+function multiply() {
+    cr.match('*');
+    factor();
+    cr.emitLn('MULS (SP)+,D0');
+}
+
+function divide() {
+    cr.match('/');
+    factor();
+    cr.emitLn('MOVE (SP)+,D1');
+    cr.emitLn('DIVS D1,D0');
+}
+
+function assigment(){
+    var name = cr.getName();
+    cr.match('=');
+    expression();
+    cr.emitLn('LEA ' + name + ' (PC),A0');
+    cr.emitLn('MOVE D0, (A0)');
+}
+
 function expression() {
     if (cr.isAddOp(_look))
         cr.emitLn('CLR D0');
@@ -68,18 +89,6 @@ function expression() {
     }
 }
 
-function multiply() {
-    cr.match('*');
-    factor();
-    cr.emitLn('MULS (SP)+,D0');
-}
-
-function divide() {
-    cr.match('/');
-    factor();
-    cr.emitLn('MOVE (SP)+,D1');
-    cr.emitLn('DIVS D1,D0');
-}
 
 function add() {
     cr.match('+');
@@ -94,9 +103,9 @@ function subtract() {
     cr.emitLn('NEG D0')
 }
 
-cr.init(`-1-(2+3)*5*a+x()
+cr.init(` y= - 1 - (2 + 3) * 5 * a + x()
 `);
-expression();
+assigment();
 
 if (_look !== '\n')
     cr.expected("New line");
