@@ -1,104 +1,61 @@
 const cr = require("./cradle");
 
-function factor() {
-    if (_look === '(') {
-        cr.match('(');
-        expression();
-        cr.match(')');
-    }
-    else if (cr.isAlpha(_look)){
-        ident();
-    }
-    else {
-        cr.emitLn('MOVE #' + cr.getNum() + ',D0');
-    }
-}
 
-// Parse and translate an Identifier.
-function ident(){
-    var name = cr.getName();
-    if (_look === '('){
-        cr.match('(');
-        cr.match(')');
-        cr.emitLn('BRS ' + name);
+function expression() {
+    let value = 0, next = true;
+
+    if (!cr.isAddOp(_look))
+        value = term();
+
+    while (next) {
+        switch (_look) {
+            case '+':
+                cr.match('+');
+                value += term();
+                break;
+            case '-':
+                cr.match('-');
+                value -= term();
+                break;
+            default:
+                next = false;
+                break;
+        }
     }
-    else{
-        cr.emitLn('MOVE ' + name + ',D0');
-    }
+
+    return value;
 }
 
 function term() {
-    factor();
+    let next = true;
+    let value = cr.getNum();
 
-    while (['*', '/'].includes(_look)) {
-        cr.emitLn('MOVE D0,-(SP)');
+    while (next) {
         switch (_look) {
             case '*':
-                multiply();
+                cr.match('*');
+                value *= cr.getNum();
                 break;
             case '/':
-                divide();
+                cr.match('/');
+                value /= cr.getNum();
                 break;
             default:
-                cr.expected('* or /');
+                next = false;
                 break;
         }
     }
+
+    return value;
 }
 
-function expression() {
-    if (cr.isAddOp(_look))
-        cr.emitLn('CLR D0');
-    else
-        term();
 
-    while (cr.isAddOp(_look)) {
-        cr.emitLn('MOVE D0,-(SP)');
-        switch (_look) {
-            case '+':
-                add();
-                break;
-            case '-':
-                subtract();
-                break;
-            default:
-                cr.expected('+ or -');
-                break;
-        }
-    }
-}
 
-function multiply() {
-    cr.match('*');
-    factor();
-    cr.emitLn('MULS (SP)+,D0');
-}
+cr.init(`11/33+22/33`);
 
-function divide() {
-    cr.match('/');
-    factor();
-    cr.emitLn('MOVE (SP)+,D1');
-    cr.emitLn('DIVS D1,D0');
-}
+cr.writeLn(expression());
 
-function add() {
-    cr.match('+');
-    term();
-    cr.emitLn('ADD (SP)+,D0')
-}
-
-function subtract() {
-    cr.match('-');
-    term();
-    cr.emitLn('SUB (SP)+,D0')
-    cr.emitLn('NEG D0')
-}
-
-cr.init(`-1-(2+3)*5*a+x()
-`);
-expression();
-
-if (_look !== '\n')
-    cr.expected("New line");
+// if (_look !== '\n')
+//     cr.expected("New line");
 
 // https://www.asm80.com/

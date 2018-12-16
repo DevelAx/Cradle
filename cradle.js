@@ -1,5 +1,6 @@
 'use strict';
 
+const _zeroCode = '0'.charCodeAt(0);
 const TAB = '\t';
 global._look = ''; // lookahead char
 var _text, _pos;
@@ -16,7 +17,8 @@ module.exports = {
     isDigit,
     getName,
     getNum,
-    emitLn
+    emitLn,
+    writeLn
 }
 
 // Initialize.
@@ -52,7 +54,7 @@ function expected(s) {
 function match(x) {
     if (_look !== x)
         return expected(`'${x}'`);
-    
+
     getChar();    
 }
 
@@ -83,12 +85,17 @@ function getName() {
 
 // Get a number.
 function getNum() {
+    var value = 0;
+
     if (!isDigit(_look))
         expected('Integer');
 
-    var result = _look;
-    getChar();
-    return result;
+    while(isDigit(_look)){
+        value = value * 10 + _look.charCodeAt(0) - _zeroCode;
+        getChar();
+    }
+    
+    return value;
 }
 
 // Output a string with TAB and LN.
