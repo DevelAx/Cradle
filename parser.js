@@ -28,17 +28,17 @@ function expression() {
 
 function term() {
     let next = true;
-    let value = cr.getNum();
+    let value = factor();
 
     while (next) {
         switch (_look) {
             case '*':
                 cr.match('*');
-                value *= cr.getNum();
+                value *= factor();
                 break;
             case '/':
                 cr.match('/');
-                value /= cr.getNum();
+                value /= factor();
                 break;
             default:
                 next = false;
@@ -49,9 +49,22 @@ function term() {
     return value;
 }
 
+function factor(){
+    if (_look==='('){
+        cr.match('(');
+        var result = expression();
+        cr.match(')');
+    }
+    else{
+        result = cr.getNum();
+    }
+
+    return result;
+}
 
 
-cr.init(`11/33+22/33`);
+
+cr.init(`11/(33+22)/33`);
 
 cr.writeLn(expression());
 
