@@ -4,75 +4,60 @@ const TAB = '\t';
 global._look = ''; // lookahead char
 var _text, _pos;
 
-module.exports = {
-    init,
-    getChar,
-    error,
-    abort,
-    expected,
-    match,
-    isAddOp,
-    isAlpha,
-    isDigit,
-    getName,
-    getNum,
-    emitLn
-}
-
 // Initialize.
-function init(s) {
+global.init = function (s) {
     _text = s;
     _pos = 0;
     getChar();
 }
 
 // Read a new char from the input stream.
-function getChar() {
+global.getChar = function () {
     _look = _text[_pos++];
 }
 
 // Report an error.
-function error(s) {
+global.error = function (s) {
     writeLn();
     writeError('Error: ', s + '.');
 }
 
 // Report an error and halt.
-function abort(s) {
+global.abort = function (s) {
     error(s);
     process.exit(-1);
 }
 
 // Report what was expected.
-function expected(s) {
+global.expected = function (s) {
     abort(`'${s}' expected`);
 }
 
 // Match a specific input char.
-function match(x) {
+global.match = function (x) {
     if (_look !== x)
         return expected(`'${x}'`);
-    
-    getChar();    
+
+    getChar();
 }
 
-function isAddOp(c){
+global.isAddOp = function (c) {
     return ['+', '-'].includes(c);
 }
 
 // Is Alpha Character.
-function isAlpha(c) {
+global.isAlpha = function (c) {
     c = c.toUpperCase();
     return (c >= 'A' && c <= 'Z');
 }
 
 // Is a decimal digit.
-function isDigit(c) {
+global.isDigit = function (c) {
     return (c >= '0' && c <= '9');
 }
 
 // Get an identifier.
-function getName() {
+global.getName = function () {
     if (!isAlpha(_look))
         expected('Name');
 
@@ -82,7 +67,7 @@ function getName() {
 }
 
 // Get a number.
-function getNum() {
+global.getNum = function () {
     if (!isDigit(_look))
         expected('Integer');
 
@@ -92,14 +77,14 @@ function getNum() {
 }
 
 // Output a string with TAB and LN.
-function emitLn(s) {
+global.emitLn = function (s) {
     writeLn(TAB, s);
 }
 
-function writeLn() {
+global.writeLn = function () {
     console.log.apply(console, arguments);
 }
 
-function writeError() {
+global.writeError = function () {
     console.error.apply(console, arguments);
 }
